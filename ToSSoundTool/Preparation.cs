@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToSSoundTool.Properties;
 using tpIpfTool;
 
 namespace ToSSoundTool
@@ -57,7 +58,7 @@ namespace ToSSoundTool
                 File.Delete(file);
             }
 
-
+            string patchno = null;
             //find sound.ipf
             foreach (var patch in patches)
             {
@@ -74,7 +75,7 @@ namespace ToSSoundTool
                         //OK
                         toextpatch = patch;
                         //extract sound.ipf
-                    
+                        patchno = patch;
                         var sounds = result.Item1.Where((x) => x.archNm == "sound.ipf");
                         foreach (var f in sounds)
                         {
@@ -117,7 +118,7 @@ namespace ToSSoundTool
                 //sound.ipf not found in patch
                 throw new InvalidDataException("NotFound sound.ipf in patches");
             }
-
+        
             OnMessage?.Invoke(this, "Extract sound.ipf");
            
             string sedir = Path.Combine(Properties.Settings.Default.IntermediatePath, "seoriginal");
@@ -239,6 +240,7 @@ namespace ToSSoundTool
 
             //complete
             OnMessage?.Invoke(this, "Complete");
+            Settings.Default.PatchVer = patchno;
         }
 
         public void Cancel()

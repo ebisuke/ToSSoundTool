@@ -15,5 +15,11 @@ namespace ToSSoundTool
             Directory = 1,
             AllowUnprivilegedCreate = 2
         }
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode )]
+        public static extern bool CreateHardLink(
+            string lpFileName,
+            string lpExistingFileName,
+            IntPtr lpSecurityAttributes
+        );
     }
 }

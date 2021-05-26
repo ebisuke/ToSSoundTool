@@ -66,15 +66,15 @@ namespace ToSSoundTool
                 "misc",
                 "mon",
                 "pc",
-                "skilvoice",
-                "skilvoice\\Japanese",
+                "skillvoice",
+                "skillvoice\\Japanese",
             };
             OnMessage?.Invoke(this, "Copy Modified Sounds");
             foreach (var v in _modifyData.ModifyDictionary)
             {
                 CheckCancel();
                 OnMessage?.Invoke(this,  Path.GetFileName( v.Value)+">"+Path.GetFileName(v.Key));
-                File.Copy(v.Key,Path.Combine(genedir, v.Value));
+                File.Copy(v.Value,Path.Combine(genedir,Path.GetFileName( v.Key)));
                 
             }
             OnMessage?.Invoke(this, "Encode wav to mp3 and ogg");
@@ -106,7 +106,7 @@ namespace ToSSoundTool
                 {
                 }
             }
-            OnMessage?.Invoke(this, "Clear Previous Symlink");
+            OnMessage?.Invoke(this, "Clear Previous Hardlink");
             foreach (var s in duplicatedirs)
             {
                 var ss = Path.Combine(sedir, s);
@@ -123,7 +123,7 @@ namespace ToSSoundTool
                 }
             }
 
-            OnMessage?.Invoke(this, "Creating Symlink");
+            OnMessage?.Invoke(this, "Creating Hardlink");
             string[] compfiles = Directory.GetFiles(complementarydir, "*");
             foreach (string file in compfiles)
             {
@@ -133,11 +133,10 @@ namespace ToSSoundTool
                 {
                     var ss = Path.Combine(sedir, s);
                     
-                    PInvoke.CreateSymbolicLink(
+                    PInvoke.CreateHardLink(
                         Path.GetFullPath(Path.Combine(ss, Path.GetFileName(file))),
-                        Path.GetFullPath(Path.Combine(genedir, Path.GetFileName(file))),
-                        PInvoke.SYMBOLIC_LINK_FLAG.File |
-                        PInvoke.SYMBOLIC_LINK_FLAG.AllowUnprivilegedCreate
+                        Path.GetFullPath(Path.Combine(complementarydir, Path.GetFileName(file))),
+                        IntPtr.Zero
                     );
                 }
             }
@@ -150,11 +149,10 @@ namespace ToSSoundTool
                 {
                     var ss = Path.Combine(sedir, s);
                     
-                    PInvoke.CreateSymbolicLink(
+                    PInvoke.CreateHardLink(
                         Path.GetFullPath(Path.Combine(ss, Path.GetFileName(file))),
                             Path.GetFullPath(Path.Combine(genedir, Path.GetFileName(file))),
-                        PInvoke.SYMBOLIC_LINK_FLAG.File |
-                        PInvoke.SYMBOLIC_LINK_FLAG.AllowUnprivilegedCreate
+                        IntPtr.Zero
                     );
                 }
             }
@@ -168,11 +166,10 @@ namespace ToSSoundTool
                     var ss = Path.Combine(sedir, s);
                     if (!File.Exists(Path.Combine(ss, Path.GetFileName(file))))
                     {
-                        PInvoke.CreateSymbolicLink(
+                        PInvoke.CreateHardLink(
                             Path.GetFullPath(Path.Combine(ss, Path.GetFileName(file))),
                             Path.GetFullPath(Path.Combine(seoriginaldir, Path.GetFileName(file))),
-                            PInvoke.SYMBOLIC_LINK_FLAG.File |
-                            PInvoke.SYMBOLIC_LINK_FLAG.AllowUnprivilegedCreate
+                            IntPtr.Zero
                         );
                     }
                 }
@@ -185,11 +182,11 @@ namespace ToSSoundTool
             {
                 File.Delete(f);
             }
-        
+            CheckCancel();
 
-            OnMessage?.Invoke(this, "Building FSB.");
+            OnMessage?.Invoke(this, "Building FSB. Please wait a moment...");
             Process proc = Process.Start(new ProcessStartInfo(Settings.Default.FModclPath,
-                $"-L japanese -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
+                $"-l -p -h -L japanese -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
             {
                 CreateNoWindow = true,
                 WorkingDirectory = projdir,
@@ -200,7 +197,13 @@ namespace ToSSoundTool
             });
             try
             {
-                    
+                proc.OutputDataReceived += (o, e) =>
+                {
+                    if (e.Data != null)
+                    {
+                        OnMessage?.Invoke(this, e.Data);
+                    }
+                };
                 proc.ErrorDataReceived += (o, e) =>
                 {
                     if (e.Data != null)
@@ -209,6 +212,7 @@ namespace ToSSoundTool
                     }
                 };
                 proc.BeginErrorReadLine();
+                proc.BeginOutputReadLine();
                 while (!proc.WaitForExit(100))
                 {
                     CheckCancel();
@@ -222,8 +226,8 @@ namespace ToSSoundTool
                 throw;
             }
             
-            
-            OnMessage?.Invoke(this, "Building Ipf.");
+            CheckCancel();
+            OnMessage?.Invoke(this, "Building Ipf. Please wait a moment...");
             var ipffiles = Directory.GetFiles(ipfdir,"*");
             foreach (var f in ipffiles)
             {
@@ -234,16 +238,19 @@ namespace ToSSoundTool
             {
                 File.Copy(f,Path.Combine(ipfdir,Path.GetFileName(f)));
             }
-
-            ipffiles = Directory.GetFiles(ipfdir,"*");
+            CheckCancel();
             IpfPack ipf = new IpfPack();
-            ipf.PacIpf(ipffiles, uint.Parse(Settings.Default.PatchVer), uint.Parse(Settings.Default.PatchVer), 
-                Path.Combine(Settings.Default.IntermediatePath, "tmp.ipf"));
+            ipf.PacIpf(new []{ipfdir}, 
+                uint.Parse(Settings.Default.PatchVer), 
+                uint.Parse(Settings.Default.PatchVer), 
+                Path.Combine(Settings.Default.IntermediatePath, "tmp"));
             File.Copy(Path.Combine(Settings.Default.IntermediatePath, "tmp.ipf"),Settings.Default.IpfName,true);
             
 
             OnMessage?.Invoke(this, "Complete.");
 
+            //Show Result log
+            Process.Start(Path.Combine(projdir, "fmod_designer.log"));
         }
 
         public void Cancel()

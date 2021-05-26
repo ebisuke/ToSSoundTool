@@ -62,10 +62,12 @@ namespace ToSSoundTool
             try
             {
                 Proc.Run();
+                DialogResult = DialogResult.OK;
             }
             catch (Exception exception)
             {
                 _capturedException = exception;
+                DialogResult = DialogResult.Cancel;
             }
         }
 
@@ -91,6 +93,11 @@ namespace ToSSoundTool
 
                 listBox1.SelectedIndex = listBox1.Items.Count - 1;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Cancel();
         }
     }
 }

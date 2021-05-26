@@ -43,7 +43,10 @@ namespace ToSSoundTool
 
             Preparation prep = new Preparation();
             ProgressForm form = new ProgressForm(prep);
-            form.ShowDialog(this);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("Completed");
+            }
             UpdateOriginal();
         }
 
@@ -159,13 +162,21 @@ namespace ToSSoundTool
             }
         }
 
-        private void toolStripButton6_Click(object sender, EventArgs e)
+        private void onMenuNew(object sender, EventArgs e)
         {
+            if(MessageBox.Show("Do you want to clear assignment?",
+                "New Document",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question)==DialogResult.No)
+            {
+                return;
+            }
+
             _modifyData = new SoundModifyData();
             UpdateOriginal();
         }
 
-        private void toolStripButton4_Click(object sender, EventArgs e)
+        private void onMenuOpen(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
@@ -177,7 +188,7 @@ namespace ToSSoundTool
             UpdateOriginal();
         }
 
-        private void toolStripButton5_Click(object sender, EventArgs e)
+        private void onMenuSave(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
@@ -225,7 +236,31 @@ namespace ToSSoundTool
 
             Build b = new Build(_modifyData);
             ProgressForm pf = new ProgressForm(b);
-            pf.ShowDialog();
+            if (pf.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("Completed");
+            }
+        }
+
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog()
+            {
+                DefaultExt = "txt",
+                Filter = "Text|*.txt|All Files|*"
+            };
+            if (sfd.ShowDialog(this) == DialogResult.OK)
+            {
+                using (StreamWriter sw = new StreamWriter(sfd.FileName))
+                {
+                    foreach (var v in this._originalSounds)
+                    {
+                        sw.WriteLine(v);
+                    }
+                }
+            }
+
         }
     }
 }

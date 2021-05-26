@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace tpIpfTool {
 
         private void Print(string s)
         {
+	        Debug.Print(s);
 			_Print?.Invoke(s);
         }
 
@@ -103,7 +105,9 @@ namespace tpIpfTool {
 						fti.dataPos = (int) fw.Position;
 						fti.deplLen = (int) fr.Length;
 						string ext = Path.GetExtension(fti.filePath.ToLower());
-						if ((ext == ".jpg") || (ext == ".fsb") || (ext == ".mp3"))
+						//if ((ext == ".jpg") || (ext == ".fsb") || (ext == ".mp3"))
+						//高速化のため圧縮をなくす
+						if(true)
 						{
 							byte[] readBuf = new byte[4096];
 							for (int readSize = 0;;)

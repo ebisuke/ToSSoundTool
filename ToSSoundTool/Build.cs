@@ -260,7 +260,7 @@ namespace ToSSoundTool
             //     uint.Parse(Settings.Default.PatchVer), 
             //     Path.Combine(Settings.Default.IntermediatePath, "tmp"));
             Process procipf = Process.Start(new ProcessStartInfo(Path.Combine(procdir,"ipfwin.exe"),
-                $"-r {Settings.Default.PatchVer} -v {Settings.Default.PatchVer} tmp.ipf {ipfparentdir}")
+                $"-r {Settings.Default.PatchVer} -b {Settings.Default.PatchVer} tmp.ipf \"{ipfparentdir}\"")
             {
                 CreateNoWindow = true,
                 WorkingDirectory = projdir,

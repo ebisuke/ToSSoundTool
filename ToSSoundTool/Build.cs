@@ -44,7 +44,12 @@ namespace ToSSoundTool
             {
                 throw new InvalidOperationException("Please preparation first.");
             }
-            string ipfdir = Path.Combine(Properties.Settings.Default.IntermediatePath, "sound.ipf");
+            string ipfparentdir = Path.Combine(Properties.Settings.Default.IntermediatePath, "ipf");
+            if (!Directory.Exists(ipfparentdir))
+            {
+                Directory.CreateDirectory(ipfparentdir);
+            }
+            string ipfdir = Path.Combine(ipfparentdir, "sound.ipf");
             if (!Directory.Exists(ipfdir))
             {
                 Directory.CreateDirectory(ipfdir);
@@ -238,12 +243,63 @@ namespace ToSSoundTool
             {
                 File.Copy(f,Path.Combine(ipfdir,Path.GetFileName(f)));
             }
+            var bakfiles = Directory.GetFiles(ipfdir,"*.bak");
+            foreach (var f in bakfiles)
+            {
+                File.Delete(f);
+            }
+            var lstfiles = Directory.GetFiles(ipfdir,"*.lst");
+            foreach (var f in lstfiles)
+            {
+                File.Delete(f);
+            }
             CheckCancel();
-            IpfPack ipf = new IpfPack();
-            ipf.PacIpf(new []{ipfdir}, 
-                uint.Parse(Settings.Default.PatchVer), 
-                uint.Parse(Settings.Default.PatchVer), 
-                Path.Combine(Settings.Default.IntermediatePath, "tmp"));
+            // IpfPack ipf = new IpfPack();
+            // ipf.PacIpf(new []{ipfdir}, 
+            //     uint.Parse(Settings.Default.PatchVer), 
+            //     uint.Parse(Settings.Default.PatchVer), 
+            //     Path.Combine(Settings.Default.IntermediatePath, "tmp"));
+            Process procipf = Process.Start(new ProcessStartInfo(Path.Combine(procdir,"ipfwin.exe"),
+                $"-r {Settings.Default.PatchVer} -v {Settings.Default.PatchVer} tmp.ipf {ipfparentdir}")
+            {
+                CreateNoWindow = true,
+                WorkingDirectory = projdir,
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            });
+            try
+            {
+                procipf.OutputDataReceived += (o, e) =>
+                {
+                    if (e.Data != null)
+                    {
+                        OnMessage?.Invoke(this, e.Data);
+                    }
+                };
+                procipf.ErrorDataReceived += (o, e) =>
+                {
+                    if (e.Data != null)
+                    {
+                        OnMessage?.Invoke(this, e.Data);
+                    }
+                };
+                procipf.BeginErrorReadLine();
+                procipf.BeginOutputReadLine();
+                while (!procipf.WaitForExit(100))
+                {
+                    CheckCancel();
+                    procipf.StandardInput.WriteLine();
+                        
+                }
+            }catch (Exception)
+            {
+                procipf.Kill();
+                throw;
+            }
+
+            
             File.Copy(Path.Combine(Settings.Default.IntermediatePath, "tmp.ipf"),Settings.Default.IpfName,true);
             
 

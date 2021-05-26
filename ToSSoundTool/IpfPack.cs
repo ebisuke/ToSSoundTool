@@ -105,9 +105,9 @@ namespace tpIpfTool {
 						fti.dataPos = (int) fw.Position;
 						fti.deplLen = (int) fr.Length;
 						string ext = Path.GetExtension(fti.filePath.ToLower());
-						//if ((ext == ".jpg") || (ext == ".fsb") || (ext == ".mp3"))
-						//高速化のため圧縮をなくす
-						if(true)
+						if ((ext == ".jpg") || (ext == ".fsb") || (ext == ".mp3"))
+						//高速化のため一部圧縮をなくす
+						
 						{
 							byte[] readBuf = new byte[4096];
 							for (int readSize = 0;;)
@@ -127,19 +127,24 @@ namespace tpIpfTool {
 							{
 								using (var deflStrm = new DeflateStream(memStrm, CompressionMode.Compress, true))
 								{
-									byte[] readBuf = new byte[4096];
-									for (int readSize = 0, readPos = 0;; readPos += readSize)
-									{
-										Array.Resize(ref readBuf, readPos + 4096);
-										readSize = fr.Read(readBuf, readPos, 4096);
-										if (readSize == 0)
+									using(MemoryStream memst = new MemoryStream()){
+									
+										for (int readSize = 0, readPos = 0;; readPos += readSize)
 										{
-											Array.Resize(ref readBuf, readPos);
-											break;
+											byte[] readBuf = new byte[4096];
+											//Array.Resize(ref readBuf, readPos + 4096);
+											readSize = fr.Read(readBuf, 0, 4096);
+											if (readSize == 0)
+											{
+												
+												break;
+											}
+											memst.Write(readBuf,0,readSize);
 										}
-									}
+										
 
-									deflStrm.Write(readBuf, 0, readBuf.Length);
+										deflStrm.Write(memst.ToArray(), 0, (int) memst.Length);
+									}
 								}
 
 								var tmpBuf = memStrm.ToArray();

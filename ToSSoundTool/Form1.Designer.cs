@@ -259,7 +259,7 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {this.toolStripButton6, this.toolStripButton4, this.toolStripButton5, this.toolStripSeparator1, this.toolStripButton1, this.toolStripSeparator2, this.toolStripButton2, this.toolStripButton3});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(321, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(290, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // toolStripButton6
@@ -370,6 +370,11 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+
+
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
 

@@ -259,11 +259,12 @@ namespace ToSSoundTool
             //     uint.Parse(Settings.Default.PatchVer), 
             //     uint.Parse(Settings.Default.PatchVer), 
             //     Path.Combine(Settings.Default.IntermediatePath, "tmp"));
+            Debug.Print($"-r {Settings.Default.PatchVer} -b {Settings.Default.PatchVer} tmp.ipf \"{ipfparentdir.Replace('\\','/')}\"");
             Process procipf = Process.Start(new ProcessStartInfo(Path.Combine(procdir,"ipfwin.exe"),
-                $"-r {Settings.Default.PatchVer} -b {Settings.Default.PatchVer} tmp.ipf \"{ipfparentdir}\"")
+                $"-r {Settings.Default.PatchVer} -b {Settings.Default.PatchVer} tmp.ipf \"{ipfparentdir.Replace('\\','/')}\"")
             {
                 CreateNoWindow = true,
-                WorkingDirectory = projdir,
+                WorkingDirectory = Settings.Default.IntermediatePath,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
                 RedirectStandardError = true,

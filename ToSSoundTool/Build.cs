@@ -191,7 +191,7 @@ namespace ToSSoundTool
 
             OnMessage?.Invoke(this, "Building FSB. Please wait a moment...");
             Process proc = Process.Start(new ProcessStartInfo(Settings.Default.FModclPath,
-                $"-l -p -h -L japanese -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
+                $"-r -l -p -h -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
             {
                 CreateNoWindow = true,
                 WorkingDirectory = projdir,

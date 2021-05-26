@@ -70,12 +70,13 @@ namespace ToSSoundTool
                 using (FileStream fs = new FileStream(patch, FileMode.Open, FileAccess.Read))
                 {
                     var result = ipf.CheckIpf(fs);
+                    patchno = result.Item2.ipfPkgVer.ToString();
                     if (result.Item1.Any((x) => x.archNm == "sound.ipf"))
                     {
                         //OK
                         toextpatch = patch;
                         //extract sound.ipf
-                        patchno = patch;
+                       
                         var sounds = result.Item1.Where((x) => x.archNm == "sound.ipf");
                         foreach (var f in sounds)
                         {
@@ -241,6 +242,7 @@ namespace ToSSoundTool
             //complete
             OnMessage?.Invoke(this, "Complete");
             Settings.Default.PatchVer = patchno;
+            Settings.Default.Save();
         }
 
         public void Cancel()

@@ -61,13 +61,25 @@ namespace ToSSoundTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Designer\\fmod_designercl.exe\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Designer\\fmod_designercl.exe")]
         public string FModclPath {
             get {
                 return ((string)(this["FModclPath"]));
             }
             set {
                 this["FModclPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("328944")]
+        public string PatchVer {
+            get {
+                return ((string)(this["PatchVer"]));
+            }
+            set {
+                this["PatchVer"] = value;
             }
         }
     }

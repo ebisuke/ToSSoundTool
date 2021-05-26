@@ -12,7 +12,10 @@
       <Value Profile="(Default)">__📖_ModifiedSound.ipf</Value>
     </Setting>
     <Setting Name="FModclPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"C:\Program Files (x86)\FMOD SoundSystem\FMOD Designer\fmod_designercl.exe"</Value>
+      <Value Profile="(Default)">C:\Program Files (x86)\FMOD SoundSystem\FMOD Designer\fmod_designercl.exe</Value>
+    </Setting>
+    <Setting Name="PatchVer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">328944</Value>
     </Setting>
   </Settings>
 </SettingsFile>

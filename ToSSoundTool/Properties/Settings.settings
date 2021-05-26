@@ -1,7 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ToSSoundTool.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BasePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Program Files (x86)\Steam\steamapps\common\Tree of Savior (Japanese Ver.)</Value>
+    </Setting>
+    <Setting Name="IntermediatePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">intermediate\</Value>
+    </Setting>
+    <Setting Name="IpfName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">__📖_ModifiedSound.ipf</Value>
+    </Setting>
+    <Setting Name="FModclPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"C:\Program Files (x86)\FMOD SoundSystem\FMOD Designer\fmod_designercl.exe"</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

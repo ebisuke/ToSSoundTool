@@ -10,10 +10,15 @@ namespace tpIpfTool {
 	public class IpfPack {
 
 		public delegate void DlgPrint(string s);
-		DlgPrint Print;
+		DlgPrint _Print;
 
-		public IpfPack(DlgPrint dlg) {
-			Print = dlg;
+        private void Print(string s)
+        {
+			_Print?.Invoke(s);
+        }
+
+		public IpfPack(DlgPrint dlg=null) {
+			_Print = dlg;
 		}
 
 		void ExPrint(string t, StreamWriter sw) {
@@ -247,7 +252,7 @@ namespace tpIpfTool {
 			return -9999;
 		}
 		
-		private int Ext1File(Stream fs, FileTableInf fti, string tgtDir) {
+		public int Ext1File(Stream fs, FileTableInf fti, string tgtDir) {
 			//Print("生成:"+fti.archNm+"/"+System.IO.Path.GetDirectoryName(fti.fileNm));
 			if (!Directory.Exists(tgtDir+"/"+fti.archNm+"/"+Path.GetDirectoryName(fti.fileNm))) {
 				Directory.CreateDirectory(tgtDir+"/"+fti.archNm+"/"+Path.GetDirectoryName(fti.fileNm));
@@ -282,8 +287,40 @@ namespace tpIpfTool {
 			}
 			return 0;
 		}
+        public int Ext1FileToStream(Stream fs, FileTableInf fti, Stream targetStream) {
+			
+			
+			byte[] tmpBuf = new byte[fti.compLen];
+			ReadFile(fs, tmpBuf, fti.dataPos, fti.compLen);
+			if (fti.compLen == fti.deplLen) {
 
-		private (List<FileTableInf>,IpfInfo) CheckIpf(Stream fs, StreamWriter sw ) {
+                targetStream.Write(tmpBuf, 0, fti.compLen);
+				return 0;
+			}
+			IpfCrypt ic = new IpfCrypt();
+			//DumpBuf(tmpBuf, 32);
+			ic.DecryptBuf(tmpBuf);
+			//DumpBuf(tmpBuf, 32);
+			using (Stream memStrm = new MemoryStream(tmpBuf)) {
+				using (var deflStrm =  new DeflateStream(memStrm, CompressionMode.Decompress)) {
+
+					byte[] readBuf = new byte[4096];
+					int readSize =0;
+					for (int readPos = 0; ; readPos+=readSize) {
+						readSize= deflStrm.Read(readBuf, 0, readBuf.Length);
+						if (readSize==0) {
+							break;
+						}
+                        targetStream.Write(readBuf, 0, readSize);
+					}
+				}
+			}
+			
+			return 0;
+		}
+		
+
+		public (List<FileTableInf>,IpfInfo) CheckIpf(Stream fs, StreamWriter sw=null ) {
 			if (fs.Length<44) {
 				ExPrint("IPFサイズ不足　(最低44バイト)", sw);
 				throw new InvalidOperationException("IPFサイズ不足　(最低44バイト)");

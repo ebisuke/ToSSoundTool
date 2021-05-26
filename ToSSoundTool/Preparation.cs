@@ -70,7 +70,11 @@ namespace ToSSoundTool
                 using (FileStream fs = new FileStream(patch, FileMode.Open, FileAccess.Read))
                 {
                     var result = ipf.CheckIpf(fs);
-                    patchno = result.Item2.ipfPkgVer.ToString();
+                    if (patchno == null)
+                    {
+                        patchno = result.Item2.ipfPkgVer.ToString();
+                    }
+
                     if (result.Item1.Any((x) => x.archNm == "sound.ipf"))
                     {
                         //OK

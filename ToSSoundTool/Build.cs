@@ -34,6 +34,9 @@ namespace ToSSoundTool
             {
                 Directory.CreateDirectory(projdir);
             }
+            string projcachedir = Path.GetFullPath(Path.Combine(projdir, ".fsbcache"));
+           
+            RemoveDirRecursively(projcachedir);
             string sedir = Path.Combine(Properties.Settings.Default.IntermediatePath, "se");
             if (!Directory.Exists(sedir))
             {
@@ -188,10 +191,10 @@ namespace ToSSoundTool
                 File.Delete(f);
             }
             CheckCancel();
-
+            //remove cache
             OnMessage?.Invoke(this, "Building FSB. Please wait a moment...");
             Process proc = Process.Start(new ProcessStartInfo(Settings.Default.FModclPath,
-                $"-r -l -p -h -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
+                $"-l -p -h -pc \"{Path.GetFullPath(Path.Combine(projdir, "R1.fdp"))}\"")
             {
                 CreateNoWindow = true,
                 WorkingDirectory = projdir,
@@ -311,6 +314,26 @@ namespace ToSSoundTool
             Process.Start(Path.Combine(projdir, "fmod_designer.log"));
         }
 
+        private void RemoveDirRecursively(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                var files = Directory.GetFiles(path);
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+
+                var dirs = Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly);
+                foreach (var dir in dirs)
+                {
+
+                    RemoveDirRecursively(dir);
+                }
+
+                Directory.Delete(path);
+            }
+        }
         public void Cancel()
         {
             _cancel = true;
